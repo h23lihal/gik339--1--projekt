@@ -7,29 +7,84 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <style>
         body {
-            background-color: #8674f9; /* Bakgrundsfärg */
+            background-color: #8674f9;
         }
         .custom-bg {
-            background-color: #9fe1c3; /* Exakt grön färg */
-            border-radius: 1rem; /* Rundade hörn */
-            padding: 2rem; /* Inre marginal */
+            background-color: #f20c7b;
+            border-radius: 1rem;
+            padding: 2rem;
         }
     </style>
 </head>
 <body>
-
-    <h1 class="text-center mt-4">Labb 2 Grupp 1</h1>
-    
-    <div class="container mt-4">
+    <h1 class="text-center">Projektarbete Grupp 1</h1>
+    <section>
         <div class="row justify-content-center">
             <div class="col-12 col-md-8 col-lg-6 custom-bg">
+                <div class="mb-3">
+                    <label for="Titel" class="form-label">Titel:</label>
+                    <input type="text" class="form-control" id="Titel">
+                </div>
+                <div class="mb-3">
+                    <label for="Författare" class="form-label">Författare:</label>
+                    <input type="text" class="form-control" id="Författare">
+                </div>
+                <div class="mb-3">
+                    <label for="Genre" class="form-label">Genre:</label>
+                    <input type="text" class="form-control" id="Genre">
+                </div>
+                <button class="btn btn-primary" style="background-color:#8c0cf6; color:white;" type="button" id="clearButton">Rensa</button>
+                <button class="btn btn-primary" style="background-color:#8c0cf6; color:white;" type="button" id="saveButton">Spara</button>
                 <div id="Books">
-                    <!-- Innehåll här -->
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="background-color:#757cea;">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Sparad</h5>
+                    <button type="button" class="btn-close" style="background-color:#8c0cf6; color:white;"data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Boken sparades</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" style="background-color:#8c0cf6; color:white;"data-bs-dismiss="modal">Stäng</button>
                 </div>
             </div>
         </div>
     </div>
-    
+    <div class="modal fade" id="rensa" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="background-color:#757cea;">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="rensaLabel">Rensad</h5>
+                    <button type="button" class="btn-close" style="background-color:#8c0cf6; color:white;"data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Fälten rensades</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" style="background-color:#8c0cf6; color:white;"data-bs-dismiss="modal">Stäng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        document.getElementById("saveButton").addEventListener("click", function() {
+            var myModal = new bootstrap.Modal(document.getElementById('exampleModal'));
+            myModal.show();
+        });
+    </script>
+    <script>
+        document.getElementById("clearButton").addEventListener("click", function() {
+            var myModal = new bootstrap.Modal(document.getElementById('rensa'));
+            myModal.show();
+        });
+    </script>
 </body>
 </html>
