@@ -137,8 +137,6 @@ function deleteBook(bookId) {
 }
 
 // Rensa formulär
-clearButton.addEventListener('click', () => {
   document.getElementById('Titel').value = '';
   document.getElementById('Författare').value = '';
   document.getElementById('Genre').value = '';
-});

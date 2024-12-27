@@ -1,15 +1,12 @@
 // Installerar nödvändiga moduler
 const express = require('express');
 const sqlite = require('sqlite3').verbose();
-const WebSocket = require('ws');
 const http = require('http');
 
 // Skapar Express-server och WebSocket-server
 const server = express();
-const httpServer = http.createServer(server);
 
-// Skapar WebSocket-server
-const wss = new WebSocket.Server({ server: httpServer });
+
 const db = new sqlite.Database('./books.db'); // Ansluter till SQLite-databasen
 
 let currentId = 123456; // Startvärde för ID
@@ -26,27 +23,6 @@ server.use((req, res, next) => {
   next();
 });
 
-// Lista över aktiva WebSocket-klienter
-const clients = new Set();
-
-// Hantera WebSocket-anslutningar
-wss.on('connection', (ws) => {
-  clients.add(ws);
-  ws.on('close', () => {
-    clients.delete(ws);
-  });
-});
-
-// Skicka WebSocket-meddelande till alla klienter
-function broadcast(data) {
-  const message = JSON.stringify(data);
-  console.log('Skickar meddelande:', message);  // Logga meddelandet
-  clients.forEach(client => {
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(message);
-    }
-  });
-}
 
 // Hämta högsta ID vid serverstart
 db.get("SELECT MAX(id) AS maxId FROM books", (err, row) => {
@@ -89,7 +65,6 @@ server.post('/books', (req, res) => {
       res.status(500).send(err.message);
     } else {
       const newBook = { id: autoId, ...book };
-      broadcast({ event: 'bookAdded', data: newBook });
 
       res.send(`Boken med ID ${autoId} har sparats.`);
     }
@@ -122,7 +97,6 @@ server.put('/books', (req, res) => {
     } else {
       // Skicka realtidsuppdatering via WebSocket
       const updatedBook = { id, ...book };
-      broadcast({ event: 'bookUpdated', data: updatedBook });
 
       res.send(`Boken med ID ${id} har uppdaterats.`);
     }
@@ -142,7 +116,6 @@ server.delete('/books/:ID', (req, res) => {
           res.status(500).send(err.message);
       } else {
           // Skicka realtidsuppdatering via WebSocket
-          broadcast({ event: 'bookDeleted', data: { id: bookId } });
 
           res.send(`Boken med ID ${bookId} har tagits bort.`);
       }
