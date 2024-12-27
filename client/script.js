@@ -2,7 +2,7 @@
 const url = "http://localhost:3000/books";
 
 // WebSocket-anslutning
-const socket = new WebSocket('ws://localhost:3000');
+const socket = new WebSocket('ws://localhost:3000/');
 
 // DOM-element
 const booksContainer = document.getElementById('Books');
@@ -10,24 +10,61 @@ const saveButton = document.getElementById('saveButton');
 const clearButton = document.getElementById('clearButton');
 
 function fetchBooks() {
-fetch(url)
-  .then(response => response.json())
-  .then(data => {
-    data.forEach(book => addBookToPage(book));
+  fetch(url)
+    .then((response) => response.json())
+    .then((books) => {
+      console.log(books); // Kontrollera att data hämtas korrekt
 
-    const bookMap = new Map();
-    data.forEach((book) => {
-      bookMap.set(book.id, book);
-  });
+      if (Array.isArray(books) && books.length > 0) {
+        let html = `<ul style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; list-style-type: none; padding: 0;">`;
 
-  if (bookMap.size > 0) {
-    let html = ` `
+        // Ändra här: använd rätt variabelnamn för varje bok
+        books.forEach((book) => {  // "book" är variabelnamnet här
+          html += `
+            <div id="book-${book.id}" class="col-12 col-sm-6 col-md-4 col-lg-3 d-flex justify-content-center mb-3" style="list-style: none;">
+              <div class="books" style="
+                background-color: #A76FB4;
+                padding: 2rem;
+                border-radius: 1rem;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+                border: 0.2rem solid #000000;
+                font-size: 1.2rem;">
+                <p><strong>Titel:</strong> ${book.Titel}</p>
+                <p><strong>Författare:</strong> ${book.Författare}</p>
+                <p><strong>Genre:</strong> ${book.Gener}</p>
+                <div style="display: flex; gap: 1rem; justify-content: center;">
+                <button class="btn btn-primary" onclick="deleteBook(${book.id})" style="background-color: #FF6347; color: white; border-radius: 0.5rem;">Ta bort</button>
+                <button class="btn btn-primary" onclick="updateBook(${book.id})" style="background-color: #FF6347; color: white; border-radius: 0.5rem;">Ändra</button>
+              </div>
+              </div>
+            </div>`;
+        });
 
-  }
+        html += `</ul>`;
+
+        // Rensa och sätt in HTML i container
+        const listContainer = document.getElementById('Books');
+        listContainer.innerHTML = ''; // Töm container innan vi sätter ny HTML
+        listContainer.insertAdjacentHTML('beforeend', html); // Lägg till HTML
+      } else {
+        console.log('Ingen bok att visa');
+      }
+    })
+    .catch((error) => console.error('Error fetching books:', error));
+}
+
+window.addEventListener('load', fetchBooks);
+  
 
 // Lyssna på WebSocket-meddelanden
 socket.onmessage = (event) => {
   const message = JSON.parse(event.data);
+  console.log('Mottog WebSocket-meddelande:', message); // Logga WebSocket-meddelandet
 
   switch (message.event) {
     case 'bookAdded':
@@ -70,17 +107,17 @@ function removeBookFromPage(bookId) {
           // Rensa fälten efter sparande
           document.getElementById('Titel').value = '';
           document.getElementById('Författare').value = '';
-          document.getElementById('Genre').value = '';
+          document.getElementById('Genre').value = '';  // Kontrollera detta
   
-          // Visa modalrutan
-        const modal = new bootstrap.Modal(document.getElementById('exampleModal'));
-        modal.show();
+          const modal = new bootstrap.Modal(document.getElementById('exampleModal'));
+          modal.show();
         })
         .catch(error => console.error('Error:', error));
     } else {
       alert('Fyll i alla fält innan du sparar!');
     }
   });
+   
   
   // Ta bort bok
   function deleteBook(bookId) {
@@ -95,10 +132,8 @@ function removeBookFromPage(bookId) {
   }
   
   // Rensa formulär
-  clearButton.addEventListener('click', () => {
     document.getElementById('Titel').value = '';
     document.getElementById('Författare').value = '';
-    document.getElementById('Genre').value = '';
-  });
+    document.getElementById('Gener').value = '';
 
  

@@ -1,73 +1,59 @@
-// Installerar SQLite och kopplar till databasen
-const sqlite = require('sqlite3').verbose();
-const db = new sqlite.Database('./books.db'); // Ansluter till databasen
-
-// Installerar Express och skapar server
+// Installerar nödvändiga moduler
 const express = require('express');
+const sqlite = require('sqlite3').verbose();
+const WebSocket = require('ws');
+const http = require('http');
+
+// Skapar Express-server och WebSocket-server
 const server = express();
+const httpServer = http.createServer(server);
 
-// Håller koll på ID (simulerar lokal lagring)
-let currentId = 123456; // Startvärde
+// Skapar WebSocket-server
+const wss = new WebSocket.Server({ server: httpServer });
+const db = new sqlite.Database('./books.db'); // Ansluter till SQLite-databasen
 
-// Middleware för serverinställningar
-server
-  .use(express.json())
-  .use(express.urlencoded({ extended: false }))
-  .use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', '*');
-    res.header('Access-Control-Allow-Methods', '*');
-    next();
+let currentId = 123456; // Startvärde för ID
+
+// Middleware för att hantera JSON- och URL-kodade data
+server.use(express.json());
+server.use(express.urlencoded({ extended: false }));
+
+// Skicka CORS-header för att möjliggöra WebSocket-anslutning
+server.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', '*');
+  res.header('Access-Control-Allow-Methods', '*');
+  next();
+});
+
+// Lista över aktiva WebSocket-klienter
+const clients = new Set();
+
+// Hantera WebSocket-anslutningar
+wss.on('connection', (ws) => {
+  clients.add(ws);
+  ws.on('close', () => {
+    clients.delete(ws);
   });
+});
 
-
-  const WebSocket = require('ws');
-
-  // Skapa en WebSocket-server
-  const wss = new WebSocket.Server({ noServer: true });
-  
-  // Lista över aktiva WebSocket-klienter
-  const clients = new Set();
-  
-  // Hantera anslutningar
-  wss.on('connection', (ws) => {
-    clients.add(ws);
-  
-    // Hantera meddelanden från klienten (valfritt)
-    ws.on('message', (message) => {
-      console.log(`Meddelande från klient: ${message}`);
-    });
-  
-    // Ta bort klient från listan vid stängning
-    ws.on('close', () => {
-      clients.delete(ws);
-    });
+// Skicka WebSocket-meddelande till alla klienter
+function broadcast(data) {
+  const message = JSON.stringify(data);
+  console.log('Skickar meddelande:', message);  // Logga meddelandet
+  clients.forEach(client => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(message);
+    }
   });
-  
-  // Skicka uppdateringar till alla anslutna klienter
-  function broadcast(data) {
-    const message = JSON.stringify(data);
-    clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(message);
-      }
-    });
-  }
-  
-  // Koppla ihop WebSocket-servern med Express-servern
-  const servers = require('http').createServer(server);
-  server.on('upgrade', (request, socket, head) => {
-    wss.handleUpgrade(request, socket, head, (ws) => {
-      wss.emit('connection', ws, request);
-    });
-  });
-  
+}
+
 // Hämta högsta ID vid serverstart
 db.get("SELECT MAX(id) AS maxId FROM books", (err, row) => {
   if (err) {
     console.error("Kunde inte hämta högsta ID:", err.message);
   } else {
-    currentId = row.maxId ? row.maxId + 1 : 123456; // Om inga böcker finns, börja från 123456
+    currentId = row.maxId ? row.maxId + 1 : 123456;
   }
 });
  
@@ -83,7 +69,7 @@ server.get('/books', (req, res) => {
     if (err) {
       res.status(500).send(err.message);
     } else {
-      res.send(rows);
+      res.json(rows);
     }
   });
 });
