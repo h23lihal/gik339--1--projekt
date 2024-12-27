@@ -9,12 +9,21 @@ const booksContainer = document.getElementById('Books');
 const saveButton = document.getElementById('saveButton');
 const clearButton = document.getElementById('clearButton');
 
-
+function fetchBooks() {
 fetch(url)
   .then(response => response.json())
   .then(data => {
     data.forEach(book => addBookToPage(book));
+
+    const bookMap = new Map();
+    data.forEach((book) => {
+      bookMap.set(book.id, book);
   });
+
+  if (bookMap.size > 0) {
+    let html = ` `
+
+  }
 
 // Lyssna på WebSocket-meddelanden
 socket.onmessage = (event) => {
