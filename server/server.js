@@ -50,6 +50,21 @@ server.get('/books', (req, res) => {
   });
 });
 
+
+server.get('/books/:id' , (req, res)  => {
+  const id = (req.params.id);
+  const sql = `SELECT * FROM books WHERE id=${id}`;
+  db.all(sql, (err, rows) => {
+    if (err) {
+      res.status(500).send(err.message);
+    } else {
+      res.json(rows);
+    }
+  });
+});
+
+
+
 // Sparar en ny bok
 server.post('/books', (req, res) => {
   const book = req.body;
@@ -103,17 +118,17 @@ server.put('/books', (req, res) => {
   });
 });
 
-server.delete('/books/:ID', (req, res) => {
-  const bookId = req.params.ID; // Hämta ID från URL-parametern
+server.delete('/books/:id', (req, res) => {
+  const bookId = req.params.id; // Hämta ID från URL-parametern
 
   if (!bookId) {
       return res.status(400).send("ID krävs för att ta bort en bok.");
   }
 
-  const sql = `DELETE FROM books WHERE id = ?`;
-  db.run(sql, [bookId], (err) => {
+  const sql = `DELETE FROM books WHERE id=${bookId}`;
+  db.run(sql, (err) => {
       if (err) {
-          res.status(500).send(err.message);
+          res.status(500).send(err);
       } else {
           // Skicka realtidsuppdatering via WebSocket
 
