@@ -142,7 +142,7 @@ function deleteBook(bookId) {
     .then(message => {
       console.log(message);
 
-      // Ta bort boken från DOM direkt utan att ladda om sidan
+     // Ta bort boken från DOM direkt utan att ladda om sidan
       const bookElement = document.getElementById(`book-${bookId}`);
       if (bookElement) {
         bookElement.remove();
@@ -150,6 +150,7 @@ function deleteBook(bookId) {
     })
     .catch(error => console.error('Error:', error));
 }
+
 
 // Rensa formulär
   document.getElementById('Titel').value = '';

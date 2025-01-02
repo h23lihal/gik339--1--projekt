@@ -1,5 +1,3 @@
-
-
 // Installerar nödvändiga moduler
 const express = require('express');
 const sqlite = require('sqlite3').verbose();
@@ -109,7 +107,7 @@ server.put('/books', (req, res) => {
     if (i !== columnsArray.length - 1) updateString += ',';
   });
   
-  const sql = `UPDATE books SET ${updateString} WHERE id=${id}`;
+  const sql = `UPDATE books SET ${updateString} WHERE id=?`;
   db.run(sql, (err) => {
     if (err) {
       console.error(err);
@@ -168,7 +166,6 @@ server.delete('/books/:id', (req, res) => {
       if (err) {
           res.status(500).send(err);
       } else {
-          // Skicka realtidsuppdatering via WebSocket
 
           res.send(`Boken med ID ${bookId} har tagits bort.`);
       }
