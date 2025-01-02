@@ -93,8 +93,7 @@ saveButton.addEventListener('click', () => {
 
 // Uppdatera en bok
 function updateBook(bookId) {
-  // Skapa en funktion för att uppdatera boken, här kan du visa en modal eller en form
-  // där användaren kan ändra bokens information, för nu simulerar vi uppdateringen direkt
+  
 
   const updatedBook = {
     id: bookId,
@@ -118,22 +117,11 @@ function updateBook(bookId) {
     .catch((error) => console.error('Error updating book:', error));
 }
 
-// Ta bort en bok
 function deleteBook(bookId) {
-  fetch(`${url}/${bookId}`, {
+fetch(`${url}/${bookId}`, {
     method: 'DELETE',
   })
-    .then(response => response.text())
-    .then(message => {
-      console.log(message);
-
-      // Ta bort boken från DOM direkt utan att ladda om sidan
-      const bookElement = document.getElementById(`book-${bookId}`);
-      if (bookElement) {
-        bookElement.remove();
-      }
-    })
-    .catch(error => console.error('Error:', error));
+    .then((result) => fetchBooks());
 }
 
 // Rensa formulär

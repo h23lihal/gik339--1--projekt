@@ -119,20 +119,14 @@ server.put('/books', (req, res) => {
 });
 
 server.delete('/books/:id', (req, res) => {
-  const bookId = req.params.id; // Hämta ID från URL-parametern
+  const id = req.params.id;
+  const sql = `DELETE FROM books WHERE id = ${id}`;
 
-  if (!bookId) {
-      return res.status(400).send("ID krävs för att ta bort en bok.");
-  }
-
-  const sql = `DELETE FROM books WHERE id=${bookId}`;
   db.run(sql, (err) => {
-      if (err) {
-          res.status(500).send(err);
-      } else {
-          // Skicka realtidsuppdatering via WebSocket
-
-          res.send(`Boken med ID ${bookId} har tagits bort.`);
-      }
+    if (err) {
+      res.status(500).send(err.message);
+    } else {
+      res.send(`Boken med ID ${id} har raderats.`);
+    }
   });
 });
