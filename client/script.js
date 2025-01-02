@@ -35,8 +35,8 @@ function fetchBooks() {
                 <p><strong>Författare:</strong> ${book.Författare}</p>
                 <p><strong>Genre:</strong> ${book.Gener}</p>
                 <div style="display: flex; gap: 1rem; justify-content: center;">
-                  <button class="btn btn-primary" onclick="deleteBook(${book.id})" style="background-color: #FF6347; color: white; border-radius: 0.5rem;">Ta bort</button>
-                  <button class="btn btn-primary" onclick="updateBook(${book.id})" style="background-color: #FF6347; color: white; border-radius: 0.5rem;">Ändra</button>
+                  <button class="btn btn-primary delete-button" data-book-id="${book.id}" style="background-color: #FF6347; color: white; border-radius: 0.5rem;">Ta bort</button>
+                  <button class="btn btn-primary update-button" data-book-id="${book.id}" style="background-color: #FF6347; color: white; border-radius: 0.5rem;">Ändra</button>
                 </div>
               </div>
             </div>`;
@@ -47,6 +47,9 @@ function fetchBooks() {
         const listContainer = document.getElementById('Books');
         listContainer.innerHTML = ''; // Töm container innan vi sätter ny HTML
         listContainer.insertAdjacentHTML('beforeend', html); // Lägg till HTML
+
+        // Lägg till eventlyssnare för borttagning
+        addDeleteListeners();
       } else {
         console.log('Ingen bok att visa');
       }
@@ -91,10 +94,8 @@ saveButton.addEventListener('click', () => {
   }
 });
 
-// Uppdatera en bok
+// Funktion för att uppdatera en bok
 function updateBook(bookId) {
-  
-
   const updatedBook = {
     id: bookId,
     Titel: document.getElementById('Titel').value,
@@ -117,11 +118,35 @@ function updateBook(bookId) {
     .catch((error) => console.error('Error updating book:', error));
 }
 
+// Funktion för att ta bort en bok
 function deleteBook(bookId) {
-fetch(`${url}/${bookId}`, {
+  console.log('Försöker ta bort bok med ID:', bookId);  // Kontrollera om ID:t är korrekt här
+  fetch(`${url}/${bookId}`, {
     method: 'DELETE',
   })
-    .then((result) => fetchBooks());
+    .then((response) => response.text())
+    .then((message) => {
+      console.log(message); // Lägg till logg för att se svaret från servern
+      fetchBooks();
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+}
+
+// Lägg till eventlyssnare för varje "Ta bort"-knapp
+function addDeleteListeners() {
+  document.querySelectorAll('.delete-button').forEach(button => {
+    button.addEventListener('click', (event) => {
+      const bookId = event.target.getAttribute('data-book-id');  // Hämta bok-ID från data-attributet
+      console.log('Hämtar bookId:', bookId);  // Kontrollera om vi får ID här
+      if (bookId) {
+        deleteBook(bookId); // Skicka bok-ID till deleteBook-funktionen
+      } else {
+        console.error('Bok-ID saknas!');
+      }
+    });
+  });
 }
 
 // Rensa formulär
