@@ -36,7 +36,7 @@ function fetchBooks() {
                 <p><strong>Genre:</strong> ${book.Gener}</p>
                 <div style="display: flex; gap: 1rem; justify-content: center;">
                   <button class="btn btn-primary" onclick="deleteBook(${book.id})" style="background-color: #FF6347; color: white; border-radius: 0.5rem;">Ta bort</button>
-                  <button class="btn btn-primary" onclick="updateBook(${book.id})" style="background-color: #FF6347; color: white; border-radius: 0.5rem;">Ändra</button>
+                  <button class="btn btn-primary" onclick="updateBook(${book.ID})" style="background-color: #FF6347; color: white; border-radius: 0.5rem;">Ändra</button>
                 </div>
               </div>
             </div>`;
@@ -92,10 +92,25 @@ saveButton.addEventListener('click', () => {
 });
 
 // Uppdatera en bok
-function updateBook(bookId) {
+
+
+function updateBook(ID) {
+  fetch(`${url}/${ID}`)
+    .then(result => result.json())
+    .then(book => {
+      console.log(book);
+      
+    
+    })
+    .catch(error => console.error('Error:', error));
+
+}
+
+
+
   // Skapa en funktion för att uppdatera boken, här kan du visa en modal eller en form
   // där användaren kan ändra bokens information, för nu simulerar vi uppdateringen direkt
-
+/*
   const updatedBook = {
     id: bookId,
     Titel: document.getElementById('Titel').value,
@@ -117,7 +132,7 @@ function updateBook(bookId) {
     })
     .catch((error) => console.error('Error updating book:', error));
 }
-
+*/
 // Ta bort en bok
 function deleteBook(bookId) {
   fetch(`${url}/${bookId}`, {
