@@ -1,12 +1,6 @@
-// URL för REST API
-const url = "http://localhost:3000/books";
+const url = 'http://localhost:3000/books';
 
-// DOM-element
-const booksContainer = document.getElementById('Books');
-const saveButton = document.getElementById('saveButton');
-const clearButton = document.getElementById('clearButton');
-
-// Funktion för att hämta och visa böcker
+window.addEventListener('load', fetchBooks);
 
 function fetchBooks() {
   fetch(url)
@@ -34,10 +28,10 @@ function fetchBooks() {
                 font-size: 1.2rem;">
                 <p><strong>Titel:</strong> ${book.Titel}</p>
                 <p><strong>Författare:</strong> ${book.Författare}</p>
-                <p><strong>Genre:</strong> ${book.Gener}</p>
+                <p><strong>Genre:</strong> ${book.Genre}</p>
                 <div style="display: flex; gap: 1rem; justify-content: center;">
                   <button class="btn btn-primary" onclick="deleteBook(${book.id})" style="background-color: #FF6347; color: white; border-radius: 0.5rem;">Ta bort</button>
-                  <button class="btn btn-primary" onclick="updateBook(${book.ID})" style="background-color: #FF6347; color: white; border-radius: 0.5rem;">Ändra</button>
+                  <button class="btn btn-primary" onclick="updateBook(${book.id})" style="background-color: #FF6347; color: white; border-radius: 0.5rem;">Ändra</button>
                 </div>
               </div>
             </div>`;
@@ -55,138 +49,56 @@ function fetchBooks() {
     .catch((error) => console.error('Error fetching books:', error));
 }
 
-// Hämta böcker när sidan laddas
-window.addEventListener('load', fetchBooks);
+function setCurrentBooks(id) {
+  console.log('current', id);
 
-// Lägg till en ny bok
-saveButton.addEventListener('click', () => {
-  const Titel = document.getElementById('Titel').value;
-  const Författare = document.getElementById('Författare').value;
-  const Genre = document.getElementById('Genre').value;
-
-  if (Titel && Författare && Genre) {
-    fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ Titel, Författare, Gener: Genre })
-    })
-      .then(response => response.text())
-      .then(message => {
-        console.log(message);
-
-        // Rensa fälten efter sparande
-        document.getElementById('Titel').value = '';
-        document.getElementById('Författare').value = '';
-        document.getElementById('Genre').value = '';  // Kontrollera detta
-
-        // Visa modal efter sparande
-        const modal = new bootstrap.Modal(document.getElementById('exampleModal'));
-        modal.show();
-
-        // Uppdatera boklistan utan att ladda om sidan
-        fetchBooks();
-      })
-      .catch(error => console.error('Error:', error));
-  } else {
-    alert('Fyll i alla fält innan du sparar!');
-  }
-});
-
-// Uppdatera en bok
-
-
-function updateBook(ID) {
-  fetch(`${url}/${ID}`)
-    .then(result => result.json())
-    .then(book => {
+  fetch(`${url}/${id}`)
+    .then((result) => result.json())
+    .then((book) => {
       console.log(book);
-      
-    
-    })
-    .catch(error => console.error('Error:', error));
-
+      bookForm.Titel.value = book.Titel;
+      bookForm.Författare.value = book.Författare;
+      bookForm.Genre.value = book.Genre;
+      localStorage.setItem('currentId', book.id);
+    });
 }
 
-
-
-  // Skapa en funktion för att uppdatera boken, här kan du visa en modal eller en form
-  // där användaren kan ändra bokens information, för nu simulerar vi uppdateringen direkt
-/*
-  const updatedBook = {
-    id: bookId,
-    Titel: document.getElementById('Titel').value,
-    Författare: document.getElementById('Författare').value,
-    Gener: document.getElementById('Genre').value,
-  };
-
-  fetch(`${url}/${bookId}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(updatedBook),
-  })
-    .then((response) => response.text())
-    .then((message) => {
-      console.log(message);
-      
-      // Uppdatera boklistan utan att ladda om sidan
-      fetchBooks();
-    })
-    .catch((error) => console.error('Error updating book:', error));
+function deleteBook(id) {
+  console.log('delete', id);
+  fetch(`${url}/${id}`, { method: 'DELETE' }).then((result) => fetchBooks());
 }
-*/
-// Ta bort en bok
-function deleteBook(bookId) {
-  fetch(`${url}/${bookId}`, {
-    method: 'DELETE',
-  })
-    .then(response => response.text())
-    .then(message => {
-      console.log(message);
 
-     // Ta bort boken från DOM direkt utan att ladda om sidan
-      const bookElement = document.getElementById(`book-${bookId}`);
-      if (bookElement) {
-        bookElement.remove();
-      }
-    })
-    .catch(error => console.error('Error:', error));
-}
+bookForm.addEventListener('submit', handleSubmit);
 
 function handleSubmit(e) {
   e.preventDefault();
   const serverBookObject = {
     Titel: '',
     Författare: '',
-    Gener: ''
+    Genre: ''
   };
   serverBookObject.Titel = bookForm.Titel.value;
   serverBookObject.Författare = bookForm.Författare.value;
-  serverBookObject.Gener = bookForm.Gener.value;
-  console.log(serverBookObject);
+  serverBookObject.Genre = bookForm.Genre.value;
 
-  const id = localStorage.getItem("currentId");
+  const id = localStorage.getItem('currentId');
   if (id) {
     serverBookObject.id = id;
   }
 
+  console.log(serverBookObject);
   const request = new Request(url, {
     method: serverBookObject.id ? 'PUT' : 'POST',
     headers: {
-      'content-type': 'application/json'
+      'content-type': 'application/json',
     },
-    body: JSON.stringify(serverBookObject)
+    body: JSON.stringify(serverBookObject),
   });
 
   fetch(request).then((response) => {
-    fetchData();
+    fetchBooks();
+
     localStorage.removeItem('currentId');
     bookForm.reset();
-  
-  
-}); 
+  });
 }
-
-// Rensa formulär
-  document.getElementById('Titel').value = '';
-  document.getElementById('Författare').value = '';
-  document.getElementById('Genre').value = '';
