@@ -63,15 +63,15 @@ server.put('/books', (req, res) => {
   const bodyData = req.body;
 
   const id = bodyData.id;
-  const books = {
+  const book = {
     Titel: bodyData.Titel,
     Författare: bodyData.Författare,
     Genre: bodyData.Genre,
   };
   let updateString = '';
-  const columnsArray = Object.keys(books);
+  const columnsArray = Object.keys(book);
   columnsArray.forEach((column, i) => {
-    updateString += `${column}="${books[column]}"`;
+    updateString += `${column}="${book[column]}"`;
     if (i !== columnsArray.length - 1) updateString += ',';
   });
   const sql = `UPDATE books SET ${updateString} WHERE id=${id}`;
@@ -84,7 +84,6 @@ server.put('/books', (req, res) => {
       res.send('Boken uppdaterades');
     }
   });
-  //UPDATE users SET firstName="Mikalea",lastName="Hedberg" WHERE id=1
 });
 
 server.delete('/books/:id', (req, res) => {

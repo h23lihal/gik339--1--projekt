@@ -10,8 +10,8 @@ function fetchBooks() {
 
       if (Array.isArray(books) && books.length > 0) {
         let html = `<ul style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; list-style-type: none; padding: 0;">`;
-
-        books.forEach((book) => {
+         books.forEach((book) => {
+          
           html += `
             <div id="book-${book.id}" class="col-12 col-sm-6 col-md-4 col-lg-3 d-flex justify-content-center mb-3" style="list-style: none;">
               <div class="books" style="
@@ -31,7 +31,7 @@ function fetchBooks() {
                 <p><strong>Genre:</strong> ${book.Genre}</p>
                 <div style="display: flex; gap: 1rem; justify-content: center;">
                   <button class="btn btn-primary" onclick="deleteBook(${book.id})" style="background-color: #FF6347; color: white; border-radius: 0.5rem;">Ta bort</button>
-                  <button class="btn btn-primary" onclick="updateBook(${book.id})" style="background-color: #FF6347; color: white; border-radius: 0.5rem;">Ändra</button>
+                  <button class="btn btn-primary" onclick="editBook(${book.id})" style="background-color: #FF6347; color: white; border-radius: 0.5rem;">Ändra</button>
                 </div>
               </div>
             </div>`;
@@ -49,23 +49,25 @@ function fetchBooks() {
     .catch((error) => console.error('Error fetching books:', error));
 }
 
-function setCurrentBooks(id) {
-  console.log('current', id);
-
+// Funktion för att redigera en bok
+function editBook(id) {
   fetch(`${url}/${id}`)
-    .then((result) => result.json())
-    .then((book) => {
-      console.log(book);
-      bookForm.Titel.value = book.Titel;
-      bookForm.Författare.value = book.Författare;
-      bookForm.Genre.value = book.Genre;
+    .then(result => result.json())
+    .then(book => {
+      document.getElementById('Titel').value = book.Titel;
+      document.getElementById('Författare').value = book.Författare;
+      document.getElementById('Genre').value = book.Genre;
       localStorage.setItem('currentId', book.id);
-    });
+    })
+    .catch(error => console.error('Error:', error));
 }
 
+// Ta bort en bok
 function deleteBook(id) {
   console.log('delete', id);
   fetch(`${url}/${id}`, { method: 'DELETE' }).then((result) => fetchBooks());
+  const saveModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+  saveModal.show();
 }
 
 bookForm.addEventListener('submit', handleSubmit);
@@ -100,5 +102,8 @@ function handleSubmit(e) {
 
     localStorage.removeItem('currentId');
     bookForm.reset();
+
+    const saveModal = new bootstrap.Modal(document.getElementById('exampleModal'));
+    saveModal.show();
   });
 }
