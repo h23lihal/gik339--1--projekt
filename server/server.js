@@ -67,6 +67,7 @@ server.put('/books', (req, res) => {
     Titel: bodyData.Titel,
     Författare: bodyData.Författare,
     Genre: bodyData.Genre,
+    color: bodyData.color,
   };
   let updateString = '';
   const columnsArray = Object.keys(book);

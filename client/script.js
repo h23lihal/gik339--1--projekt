@@ -30,7 +30,7 @@ function fetchBooks() {
                 <p> <strong style="color: white;">Genre: </strong><span style="color: ${book.color};">${book.Genre}</span></p>
                 <div style="display: flex; gap: 1rem; justify-content: center;">
                   <button class="btn btn-primary" onclick="deleteBook(${book.id})" style="background-color: ${book.color}; color: black; border-radius: 0.5rem;">Ta bort</button>
-                  <button class="btn btn-primary" onclick="editBook(${book.id})" style="background-color: ${book.color}; color: black; border-radius: 0.5rem;">Ändra</button>
+                  <button class="btn btn-primary" onclick="setCurrentBook(${book.id})" style="background-color: ${book.color}; color: black; border-radius: 0.5rem;">Ändra</button>
                 </div>
               </div>
             </div>`;
@@ -48,17 +48,20 @@ function fetchBooks() {
     .catch((error) => console.error('Error fetching books:', error));
 }
 
-// Funktion för att redigera en bok
-function editBook(id) {
+function setCurrentBook(id) {
+  console.log('current', id);
+
   fetch(`${url}/${id}`)
-    .then(result => result.json())
-    .then(book => {
-      document.getElementById('Titel').value = book.Titel;
-      document.getElementById('Författare').value = book.Författare;
-      document.getElementById('Genre').value = book.Genre;
-      localStorage.setItem('currentId', book.id);
-    })
-    .catch(error => console.error('Error:', error));
+    .then((result) => result.json())
+    .then((user) => {
+      console.log(user);
+      bookForm.Titel.value = book.Titel;
+      bookForm.Författare.value = book.Författare;
+      bookForm.Genre.value = book.Genre;
+      bookForm.color.value = book.color;
+
+      localStorage.setItem('currentId', user.id);
+    });
 }
 
 // Ta bort en bok
@@ -76,11 +79,13 @@ function handleSubmit(e) {
   const serverBookObject = {
     Titel: '',
     Författare: '',
-    Genre: ''
+    Genre: '',
+    color: '',
   };
   serverBookObject.Titel = bookForm.Titel.value;
   serverBookObject.Författare = bookForm.Författare.value;
   serverBookObject.Genre = bookForm.Genre.value;
+  serverBookObject.color = bookForm.color.value;
 
   const id = localStorage.getItem('currentId');
   if (id) {
