@@ -7,6 +7,7 @@ const saveButton = document.getElementById('saveButton');
 const clearButton = document.getElementById('clearButton');
 
 // Funktion för att hämta och visa böcker
+
 function fetchBooks() {
   fetch(url)
     .then((response) => response.json())
@@ -151,6 +152,39 @@ function deleteBook(bookId) {
     .catch(error => console.error('Error:', error));
 }
 
+function handleSubmit(e) {
+  e.preventDefault();
+  const serverBookObject = {
+    Titel: '',
+    Författare: '',
+    Gener: ''
+  };
+  serverBookObject.Titel = bookForm.Titel.value;
+  serverBookObject.Författare = bookForm.Författare.value;
+  serverBookObject.Gener = bookForm.Gener.value;
+  console.log(serverBookObject);
+
+  const id = localStorage.getItem("currentId");
+  if (id) {
+    serverBookObject.id = id;
+  }
+
+  const request = new Request(url, {
+    method: serverBookObject.id ? 'PUT' : 'POST',
+    headers: {
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify(serverBookObject)
+  });
+
+  fetch(request).then((response) => {
+    fetchData();
+    localStorage.removeItem('currentId');
+    bookForm.reset();
+  
+  
+}); 
+}
 
 // Rensa formulär
   document.getElementById('Titel').value = '';
