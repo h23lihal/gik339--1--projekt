@@ -53,14 +53,14 @@ function setCurrentBook(id) {
 
   fetch(`${url}/${id}`)
     .then((result) => result.json())
-    .then((user) => {
-      console.log(user);
+    .then((book) => {
+      console.log(book);
       bookForm.Titel.value = book.Titel;
       bookForm.Författare.value = book.Författare;
       bookForm.Genre.value = book.Genre;
       bookForm.color.value = book.color;
 
-      localStorage.setItem('currentId', user.id);
+      localStorage.setItem('currentId', book.id);
     });
 }
 
