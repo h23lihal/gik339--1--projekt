@@ -11,11 +11,10 @@ function fetchBooks() {
       if (Array.isArray(books) && books.length > 0) {
         let html = `<ul style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; list-style-type: none; padding: 0;">`;
          books.forEach((book) => {
-          
           html += `
             <div id="book-${book.id}" class="col-12 col-sm-6 col-md-4 col-lg-3 d-flex justify-content-center mb-3" style="list-style: none;">
               <div class="books" style="
-                background-color: #A76FB4;
+                background-color: black;
                 padding: 2rem;
                 border-radius: 1rem;
                 width: 100%;
@@ -24,14 +23,14 @@ function fetchBooks() {
                 justify-content: center;
                 align-items: center;
                 text-align: center;
-                border: 0.2rem solid #000000;
+                border: 0.5rem solid ${book.color};
                 font-size: 1.2rem;">
-                <p><strong>Titel:</strong> ${book.Titel}</p>
-                <p><strong>Författare:</strong> ${book.Författare}</p>
-                <p><strong>Genre:</strong> ${book.Genre}</p>
+                <p> <strong style="color: white;">Titel: </strong><span style="color: ${book.color};">${book.Titel}</span></p>
+                <p> <strong style="color: white;">Författare: </strong><span style="color: ${book.color};">${book.Författare}</span></p>
+                <p> <strong style="color: white;">Genre: </strong><span style="color: ${book.color};">${book.Genre}</span></p>
                 <div style="display: flex; gap: 1rem; justify-content: center;">
-                  <button class="btn btn-primary" onclick="deleteBook(${book.id})" style="background-color: #FF6347; color: white; border-radius: 0.5rem;">Ta bort</button>
-                  <button class="btn btn-primary" onclick="editBook(${book.id})" style="background-color: #FF6347; color: white; border-radius: 0.5rem;">Ändra</button>
+                  <button class="btn btn-primary" onclick="deleteBook(${book.id})" style="background-color: ${book.color}; color: black; border-radius: 0.5rem;">Ta bort</button>
+                  <button class="btn btn-primary" onclick="editBook(${book.id})" style="background-color: ${book.color}; color: black; border-radius: 0.5rem;">Ändra</button>
                 </div>
               </div>
             </div>`;
