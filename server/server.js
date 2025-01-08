@@ -80,7 +80,7 @@ server.put('/books', (req, res) => {
   db.run(sql, (err) => {
     if (err) {
       console.log(err);
-      res.status(500).send(err);
+      res.status(500).send({ message: 'Något gick fel med att updatera boken.', error: err.message });
     } else {
       res.send('Boken uppdaterades');
     }
@@ -89,14 +89,41 @@ server.put('/books', (req, res) => {
 
 server.delete('/books/:id', (req, res) => {
   const id = req.params.id;
+  const sql = `DELETE FROM books WHERE id = ?`;  // Använd parameterisering för att undvika SQL-injektion
+
+  db.run(sql, [id], function (err) {
+    if (err) {
+      // Om ett fel inträffar, fånga upp det och skicka en 500-statuskod med felmeddelande
+      console.error('Database error:', err);  // Logga felet för debug
+      return res.status(500).json({
+        message: 'Något gick fel med att ta bort boken.',
+        error: err.message  // Skicka ett detaljerat felmeddelande från databasen
+      });
+    }
+
+    // Kontrollera om någon rad faktiskt togs bort
+    if (this.changes === 0) {
+      // Om inga rader togs bort, returnera 404 (Not Found)
+      return res.status(500).json({
+        message: 'Boken med det angivna ID:t finns inte.',
+      });
+    }
+
+    // Om borttagningen lyckades och en rad togs bort
+    res.send('Boken borttagen');
+  });
+});
+
+/*server.delete('/books/:id', (req, res) => {
+  const id = req.params.id;
   const sql = `DELETE FROM books WHERE id = ${id}`;
 
   db.run(sql, (err) => {
     if (err) {
       console.log(err);
-      res.send(500).send(err);
+      res.status(500).send
     } else {
       res.send('Boken borttagen');
     }
   });
-});
+});*/
