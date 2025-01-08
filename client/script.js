@@ -42,7 +42,7 @@ function fetchBooks() {
         listContainer.innerHTML = ''; // Töm container innan vi sätter ny HTML
         listContainer.insertAdjacentHTML('beforeend', html); // Lägg till HTML
       } else {
-        console.log('Ingen bok att visa');
+        alert('Ingen bok att visa');
       }
     })
     .catch((error) => console.error('Error fetching books:', error));
@@ -67,71 +67,6 @@ function setCurrentBook(id) {
 // Ta bort en bok
 function deleteBook(id) {
   console.log('delete', id);
-  fetch(`${url}/${id}`, { method: 'DELETE' })
-    .then((response) => {
-      if (!response.ok) {
-        
-        return response.json().then((error) => {
-          throw new Error(error.message || 'Ett okänt fel inträffade');
-        });
-      }
-  
-      fetchBooks();
-     
-      const saveModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-      saveModal.show();
-    })
-    .catch((error) => {
-      // Hantera fel om något gick fel vid borttagning
-      console.error('Fel vid borttagning:', error);
-      // Visa felmeddelande i en modal
-      const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
-      document.getElementById('errorMessage').innerText = error.message;
-      errorModal.show();
-    });
-}
-
-bookForm.addEventListener('submit', handleSubmit);
-
-function handleSubmit(e) {
-  e.preventDefault();
-  const serverBookObject = {
-    Titel: '',
-    Författare: '',
-    Genre: '',
-    color: '',
-  };
-
-  serverBookObject.Titel = bookForm.Titel.value;
-  serverBookObject.Författare = bookForm.Författare.value;
-  serverBookObject.Genre = bookForm.Genre.value;
-  serverBookObject.color = bookForm.color.value;
-
-  const id = localStorage.getItem('currentId');
-  if (id) {
-    serverBookObject.id = id;
-  }
-
-  console.log(serverBookObject);
-  const request = new Request(url, {
-    method: serverBookObject.id ? 'PUT' : 'POST',
-    headers: {
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify(serverBookObject),
-  });
-
-  fetch(request)
-    .then((response) => {
-      if (!response.ok) {
-        // Om servern returnerar ett fel (t.ex. 500 eller 400)
-        return response.json().then((error) => {
-          throw new Error(error.message || 'Ett okänt fel inträffade');
-        });
-
-// Ta bort en bok
-/*function deleteBook(id) {
-  console.log('delete', id);
   fetch(`${url}/${id}`, { method: 'DELETE' }).then((result) => fetchBooks());
   const saveModal = new bootstrap.Modal(document.getElementById('deleteModal'));
   saveModal.show();
@@ -141,23 +76,28 @@ bookForm.addEventListener('submit', handleSubmit);
 
 function handleSubmit(e) {
   e.preventDefault();
-  const serverBookObject = {
-    Titel: '',
-    Författare: '',
-    Genre: '',
-    color: '',
-  };
-  serverBookObject.Titel = bookForm.Titel.value;
-  serverBookObject.Författare = bookForm.Författare.value;
-  serverBookObject.Genre = bookForm.Genre.value;
-  serverBookObject.color = bookForm.color.value;
 
+  // Skapa serverBookObject från formulärdata
+  const serverBookObject = {
+    Titel: bookForm.Titel.value,
+    Författare: bookForm.Författare.value,
+    Genre: bookForm.Genre.value,
+    color: bookForm.color.value,
+  };
+
+  // Kontrollera om alla fält är ifyllda
+  if (!serverBookObject.Titel || !serverBookObject.Författare || !serverBookObject.Genre || !serverBookObject.color) {
+    // Om något fält är tomt, visa ett alert-meddelande
+    alert('Alla fält måste vara ifyllda.');
+    return; // Avbryt och skicka inte formuläret
+  }
+
+  // Om alla fält är ifyllda, fortsätt med att skapa boken
   const id = localStorage.getItem('currentId');
   if (id) {
     serverBookObject.id = id;
   }
 
-  console.log(serverBookObject);
   const request = new Request(url, {
     method: serverBookObject.id ? 'PUT' : 'POST',
     headers: {
@@ -167,12 +107,17 @@ function handleSubmit(e) {
   });
 
   fetch(request).then((response) => {
-    fetchBooks();
+    if (response.ok) {
+      fetchBooks(); // Uppdatera listan med böcker
+      localStorage.removeItem('currentId'); // Ta bort id från localStorage
+      bookForm.reset(); // Återställ formuläret
 
-    localStorage.removeItem('currentId');
-    bookForm.reset();
-
-    const saveModal = new bootstrap.Modal(document.getElementById('exampleModal'));
-    saveModal.show();
+      // Visa modal som bekräftar att boken har sparats/uppdaterats
+      const saveModal = new bootstrap.Modal(document.getElementById('exampleModal'));
+      saveModal.show();
+    } else {
+      // Hantera fel om något går fel på servern
+      console.error('Failed to save the book.');
+    }
   });
-}*/
+}

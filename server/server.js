@@ -113,17 +113,3 @@ server.delete('/books/:id', (req, res) => {
     res.send('Boken borttagen');
   });
 });
-
-/*server.delete('/books/:id', (req, res) => {
-  const id = req.params.id;
-  const sql = `DELETE FROM books WHERE id = ${id}`;
-
-  db.run(sql, (err) => {
-    if (err) {
-      console.log(err);
-      res.status(500).send
-    } else {
-      res.send('Boken borttagen');
-    }
-  });
-});*/
