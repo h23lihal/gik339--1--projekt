@@ -67,9 +67,36 @@ function setCurrentBook(id) {
 // Ta bort en bok
 function deleteBook(id) {
   console.log('delete', id);
-  fetch(`${url}/${id}`, { method: 'DELETE' }).then((result) => fetchBooks());
-  const saveModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-  saveModal.show();
+  fetch(`${url}/${id}`, { method: 'DELETE' })
+    .then((response) => {
+      if (response.ok) {
+        // Ta bort boken från DOM direkt
+        const bookElement = document.getElementById(`book-${id}`);
+        if (bookElement) {
+          bookElement.remove(); // Ta bort HTML-elementet för boken
+        }
+
+        // Visa modal för bekräftelse att boken raderades
+        const saveModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        saveModal.show();
+
+        // Vänta tills modal har visats innan vi kontrollerar antalet kvarvarande böcker
+        saveModal._element.addEventListener('hidden.bs.modal', () => {
+          // Kontrollera om det finns fler böcker kvar
+          const remainingBooks = document.querySelectorAll('.books');
+          if (remainingBooks.length === 0) {
+            // Visa alert om inga böcker finns kvar
+            alert('Ingen bok att visa');
+
+            const listContainer = document.getElementById('Books');
+            listContainer.innerHTML = ''; // Rensa innehållet
+          }
+        });
+      } else {
+        console.error('Failed to delete the book.');
+      }
+    })
+    .catch((error) => console.error('Error deleting the book:', error));
 }
 
 bookForm.addEventListener('submit', handleSubmit);
